@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from app.db.oracle import get_connection
+from app.db.postgres import get_connection
 from app.repositories.base_repository import BaseRepository
 
 
@@ -144,7 +144,6 @@ class PatientRepository(BaseRepository):
     ) -> int:
         with get_connection(self.pool) as connection:
             with connection.cursor() as cursor:
-                patient_id_var = cursor.var(int)
                 cursor.execute(
                     """
                     INSERT INTO patients (
@@ -154,7 +153,7 @@ class PatientRepository(BaseRepository):
                         :mrn, :first_name, :last_name, :date_of_birth, :sex, :phone_number, :email,
                         :address_line1, :address_line2, :city, :region, :country, 'Y', SYSTIMESTAMP, SYSTIMESTAMP
                     )
-                    RETURNING patient_id INTO :patient_id
+                    RETURNING patient_id
                     """,
                     {
                         "mrn": mrn,
@@ -169,11 +168,11 @@ class PatientRepository(BaseRepository):
                         "city": city,
                         "region": region,
                         "country": country,
-                        "patient_id": patient_id_var,
                     },
                 )
-                value = patient_id_var.getvalue()
-                return int(value[0] if isinstance(value, list) else value)
+                row = cursor.fetchone()
+                connection.commit()
+                return int(row["patient_id"])
 
     def update_patient(
         self,
@@ -232,6 +231,7 @@ class PatientRepository(BaseRepository):
                         "is_active": is_active,
                     },
                 )
+                connection.commit()
 
     def deactivate_patient(self, patient_id: int) -> None:
         with get_connection(self.pool) as connection:
@@ -240,6 +240,7 @@ class PatientRepository(BaseRepository):
                     "UPDATE patients SET is_active = 'N', updated_at = SYSTIMESTAMP WHERE patient_id = :patient_id",
                     {"patient_id": patient_id},
                 )
+                connection.commit()
 
     def patient_exists(self, mrn: str, exclude_patient_id: int | None = None) -> bool:
         sql = "SELECT 1 FROM patients WHERE mrn = :mrn"

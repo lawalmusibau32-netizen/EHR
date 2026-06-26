@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from app.db.oracle import get_connection
+from app.db.postgres import get_connection
 from app.repositories.base_repository import BaseRepository
 
 
@@ -18,7 +18,13 @@ class DashboardRepository(BaseRepository):
             with connection.cursor() as cursor:
                 cursor.execute(sql, params or {})
                 row = cursor.fetchone()
-                return int(row[0] if row else 0)
+                if not row:
+                    return 0
+                if isinstance(row, dict):
+                    if "total" in row:
+                        return int(row["total"])
+                    return int(next(iter(row.values())))
+                return int(row[0])
 
     def recent_activity(self, limit: int = 6):
         sql = """

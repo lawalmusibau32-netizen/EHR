@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any
 
-from app.db.oracle import get_connection
+from app.db.postgres import get_connection
 from app.repositories.base_repository import BaseRepository
 
 
@@ -62,12 +62,11 @@ class UserRepository(BaseRepository):
     def create_user(self, *, role_id: int, username: str, display_name: str, email: str | None, password_hash: str, password_salt: str) -> int:
         with get_connection(self.pool) as connection:
             with connection.cursor() as cursor:
-                user_id_var = cursor.var(int)
                 cursor.execute(
                     """
                     INSERT INTO users (role_id, username, display_name, email, password_hash, password_salt, is_active, created_at, updated_at)
                     VALUES (:role_id, :username, :display_name, :email, :password_hash, :password_salt, 'Y', SYSTIMESTAMP, SYSTIMESTAMP)
-                    RETURNING user_id INTO :user_id
+                    RETURNING user_id
                     """,
                     {
                         "role_id": role_id,
@@ -76,11 +75,11 @@ class UserRepository(BaseRepository):
                         "email": email,
                         "password_hash": password_hash,
                         "password_salt": password_salt,
-                        "user_id": user_id_var,
                     },
                 )
-                value = user_id_var.getvalue()
-                return int(value[0] if isinstance(value, list) else value)
+                row = cursor.fetchone()
+                connection.commit()
+                return int(row["user_id"])
 
     def update_last_login(self, user_id: int) -> None:
         with get_connection(self.pool) as connection:
@@ -135,7 +134,6 @@ class UserRepository(BaseRepository):
     def create_auth_session(self, *, user_id: int, jti: str, expires_at: datetime, ip_address: str, user_agent: str) -> int:
         with get_connection(self.pool) as connection:
             with connection.cursor() as cursor:
-                session_id_var = cursor.var(int)
                 cursor.execute(
                     """
                     INSERT INTO auth_sessions (
@@ -143,7 +141,7 @@ class UserRepository(BaseRepository):
                     ) VALUES (
                         :user_id, :jti, :expires_at, NULL, SYSTIMESTAMP, SYSTIMESTAMP, :ip_address, :user_agent
                     )
-                    RETURNING session_id INTO :session_id
+                    RETURNING session_id
                     """,
                     {
                         "user_id": user_id,
@@ -151,11 +149,11 @@ class UserRepository(BaseRepository):
                         "expires_at": expires_at,
                         "ip_address": ip_address,
                         "user_agent": user_agent[:255],
-                        "session_id": session_id_var,
                     },
                 )
-                value = session_id_var.getvalue()
-                return int(value[0] if isinstance(value, list) else value)
+                row = cursor.fetchone()
+                connection.commit()
+                return int(row["session_id"])
 
     def get_auth_session(self, jti: str):
         with get_connection(self.pool) as connection:

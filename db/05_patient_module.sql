@@ -66,7 +66,7 @@ INSERT INTO patients (
     address_line1, address_line2, city, region, country, is_active, created_at, updated_at
 ) VALUES (
     :mrn, :first_name, :last_name, :date_of_birth, :sex, :phone_number, :email,
-    :address_line1, :address_line2, :city, :region, :country, 'Y', SYSTIMESTAMP, SYSTIMESTAMP
+    :address_line1, :address_line2, :city, :region, :country, 'Y', NOW(), NOW()
 );
 
 -- Edit patient
@@ -85,11 +85,11 @@ SET
     region = :region,
     country = :country,
     is_active = :is_active,
-    updated_at = SYSTIMESTAMP
+    updated_at = NOW()
 WHERE patient_id = :patient_id;
 
 -- Soft delete patient
 UPDATE patients
-SET is_active = 'N', updated_at = SYSTIMESTAMP
+SET is_active = 'N', updated_at = NOW()
 WHERE patient_id = :patient_id;
 

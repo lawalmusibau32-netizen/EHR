@@ -1,8 +1,8 @@
 -- Appointment management queries for the EHR module
 -- These are reference statements aligned with the Python repository layer.
 
-ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD';
-ALTER SESSION SET NLS_TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SS.FF3';
+
+
 
 -- View/search appointments
 SELECT
@@ -15,7 +15,7 @@ SELECT
     a.status,
     a.reason,
     a.location,
-    DBMS_LOB.SUBSTR(a.notes, 4000, 1) AS notes,
+    LEFT(a.notes::text, 4000) AS notes,
     p.mrn,
     p.first_name AS patient_first_name,
     p.last_name AS patient_last_name,
@@ -33,9 +33,9 @@ WHERE (:status IS NULL OR a.status = :status)
     OR LOWER(p.first_name) LIKE LOWER(:search_like)
     OR LOWER(p.last_name) LIKE LOWER(:search_like)
     OR LOWER(a.appointment_type) LIKE LOWER(:search_like)
-    OR LOWER(NVL(a.reason, ' ')) LIKE LOWER(:search_like)
-    OR LOWER(NVL(a.location, ' ')) LIKE LOWER(:search_like)
-    OR LOWER(NVL(clinician.display_name, ' ')) LIKE LOWER(:search_like)
+    OR LOWER(COALESCE(a.reason, ' ')) LIKE LOWER(:search_like)
+    OR LOWER(COALESCE(a.location, ' ')) LIKE LOWER(:search_like)
+    OR LOWER(COALESCE(clinician.display_name, ' ')) LIKE LOWER(:search_like)
   )
 ORDER BY a.appointment_date DESC, a.created_at DESC;
 
@@ -50,7 +50,7 @@ SELECT
     a.status,
     a.reason,
     a.location,
-    DBMS_LOB.SUBSTR(a.notes, 4000, 1) AS notes,
+    LEFT(a.notes::text, 4000) AS notes,
     p.mrn,
     p.first_name AS patient_first_name,
     p.last_name AS patient_last_name,
@@ -70,7 +70,7 @@ INSERT INTO appointments (
     appointment_type, status, reason, location, notes, created_at, updated_at
 ) VALUES (
     :patient_id, :scheduled_by_user_id, :clinician_user_id, :appointment_date,
-    :appointment_type, 'SCHEDULED', :reason, :location, :notes, SYSTIMESTAMP, SYSTIMESTAMP
+    :appointment_type, 'SCHEDULED', :reason, :location, :notes, NOW(), NOW()
 );
 
 -- Reschedule or update appointment details
@@ -83,7 +83,7 @@ SET patient_id = :patient_id,
     reason = :reason,
     location = :location,
     notes = :notes,
-    updated_at = SYSTIMESTAMP
+    updated_at = NOW()
 WHERE appointment_id = :appointment_id;
 
 -- Cancel appointment
@@ -94,7 +94,7 @@ SET status = 'CANCELLED',
         WHEN notes IS NULL THEN :cancel_note
         ELSE notes || CHR(10) || :cancel_note
     END,
-    updated_at = SYSTIMESTAMP
+    updated_at = NOW()
 WHERE appointment_id = :appointment_id;
 
 -- Appointment selectors

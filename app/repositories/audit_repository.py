@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from app.db.oracle import get_connection
+from app.db.postgres import get_connection
 from app.repositories.base_repository import BaseRepository
 
 
@@ -113,7 +113,7 @@ class AuditRepository(BaseRepository):
         with get_connection(self.pool) as connection:
             with connection.cursor() as cursor:
                 cursor.execute("SELECT COUNT(1) AS total FROM audit_logs WHERE action_type = 'LOGIN_FAILED'")
-                return int(cursor.fetchone()["TOTAL"])
+                return int(cursor.fetchone()["total"])
 
     def recent_security_events(self, limit: int = 50):
         sql = """

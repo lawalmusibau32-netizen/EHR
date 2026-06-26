@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from app.db.oracle import get_connection
+from app.db.postgres import get_connection
 from app.repositories.base_repository import BaseRepository
 
 
@@ -274,7 +274,6 @@ class MedicalRecordRepository(BaseRepository):
     ) -> int:
         with get_connection(self.pool) as connection:
             with connection.cursor() as cursor:
-                record_id_var = cursor.var(int)
                 cursor.execute(
                     """
                     INSERT INTO medical_records (
@@ -284,7 +283,7 @@ class MedicalRecordRepository(BaseRepository):
                         :patient_id, :created_by_user_id, :record_type, :title, :clinical_note,
                         :record_status, :encounter_date, SYSTIMESTAMP, SYSTIMESTAMP
                     )
-                    RETURNING record_id INTO :record_id
+                    RETURNING record_id
                     """,
                     {
                         "patient_id": patient_id,
@@ -294,12 +293,11 @@ class MedicalRecordRepository(BaseRepository):
                         "clinical_note": clinical_note,
                         "record_status": record_status,
                         "encounter_date": encounter_date,
-                        "record_id": record_id_var,
                     },
                 )
+                row = cursor.fetchone()
                 connection.commit()
-                value = record_id_var.getvalue()
-                return int(value[0] if isinstance(value, list) else value)
+                return int(row["record_id"])
 
     def update_record(
         self,
@@ -347,7 +345,6 @@ class MedicalRecordRepository(BaseRepository):
     ) -> int:
         with get_connection(self.pool) as connection:
             with connection.cursor() as cursor:
-                diagnosis_id_var = cursor.var(int)
                 cursor.execute(
                     """
                     INSERT INTO record_diagnoses (
@@ -357,7 +354,7 @@ class MedicalRecordRepository(BaseRepository):
                         :record_id, :diagnosis_name, :icd10_code, :diagnosis_status, :is_primary,
                         'Y', :diagnosed_at, SYSTIMESTAMP, SYSTIMESTAMP
                     )
-                    RETURNING diagnosis_id INTO :diagnosis_id
+                    RETURNING diagnosis_id
                     """,
                     {
                         "record_id": record_id,
@@ -366,12 +363,11 @@ class MedicalRecordRepository(BaseRepository):
                         "diagnosis_status": diagnosis_status,
                         "is_primary": is_primary,
                         "diagnosed_at": diagnosed_at,
-                        "diagnosis_id": diagnosis_id_var,
                     },
                 )
+                row = cursor.fetchone()
                 connection.commit()
-                value = diagnosis_id_var.getvalue()
-                return int(value[0] if isinstance(value, list) else value)
+                return int(row["diagnosis_id"])
 
     def update_diagnosis(
         self,
@@ -430,7 +426,6 @@ class MedicalRecordRepository(BaseRepository):
     ) -> int:
         with get_connection(self.pool) as connection:
             with connection.cursor() as cursor:
-                prescription_id_var = cursor.var(int)
                 cursor.execute(
                     """
                     INSERT INTO record_prescriptions (
@@ -440,7 +435,7 @@ class MedicalRecordRepository(BaseRepository):
                         :record_id, :medication_name, :dosage, :frequency, :route, :duration_days,
                         :instructions, 'ACTIVE', 'Y', :prescribed_at, SYSTIMESTAMP, SYSTIMESTAMP
                     )
-                    RETURNING prescription_id INTO :prescription_id
+                    RETURNING prescription_id
                     """,
                     {
                         "record_id": record_id,
@@ -451,12 +446,11 @@ class MedicalRecordRepository(BaseRepository):
                         "duration_days": duration_days,
                         "instructions": instructions,
                         "prescribed_at": prescribed_at,
-                        "prescription_id": prescription_id_var,
                     },
                 )
+                row = cursor.fetchone()
                 connection.commit()
-                value = prescription_id_var.getvalue()
-                return int(value[0] if isinstance(value, list) else value)
+                return int(row["prescription_id"])
 
     def update_prescription(
         self,
@@ -522,7 +516,6 @@ class MedicalRecordRepository(BaseRepository):
     ) -> int:
         with get_connection(self.pool) as connection:
             with connection.cursor() as cursor:
-                treatment_id_var = cursor.var(int)
                 cursor.execute(
                     """
                     INSERT INTO record_treatments (
@@ -532,7 +525,7 @@ class MedicalRecordRepository(BaseRepository):
                         :record_id, :treatment_name, :treatment_description, :treatment_date,
                         :outcome, :notes, 'Y', SYSTIMESTAMP, SYSTIMESTAMP
                     )
-                    RETURNING treatment_id INTO :treatment_id
+                    RETURNING treatment_id
                     """,
                     {
                         "record_id": record_id,
@@ -541,12 +534,11 @@ class MedicalRecordRepository(BaseRepository):
                         "treatment_date": treatment_date,
                         "outcome": outcome,
                         "notes": notes,
-                        "treatment_id": treatment_id_var,
                     },
                 )
+                row = cursor.fetchone()
                 connection.commit()
-                value = treatment_id_var.getvalue()
-                return int(value[0] if isinstance(value, list) else value)
+                return int(row["treatment_id"])
 
     def update_treatment(
         self,

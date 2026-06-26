@@ -4,13 +4,13 @@ This repository provides a modular starting point for a secure Electronic Health
 
 - Frontend: HTML5, CSS3, JavaScript, Bootstrap 5
 - Backend: Python Flask
-- Database: Oracle Database
+- Database: PostgreSQL
 
 ## What is included
 
 - Flask application factory
 - Blueprint-based module layout
-- Oracle database connection configuration
+- PostgreSQL database connection configuration
 - Environment variable configuration
 - Bootstrap starter templates
 - Static asset structure for future UI work
@@ -30,7 +30,7 @@ ehr-system/
     extensions.py
     db/
       __init__.py
-      oracle.py
+      postgres.py
     blueprints/
       __init__.py
       auth/
@@ -121,7 +121,7 @@ pip install -r requirements.txt
 
 ### 4. Configure environment variables
 
-Copy `.env.example` to `.env` and update the Oracle credentials and secret key.
+Copy `.env.example` to `.env` and update the PostgreSQL credentials and secret key.
 
 ### 5. Run the application
 
@@ -131,20 +131,19 @@ python run.py
 
 The app will start in development mode using the Flask development server.
 
-## Oracle database setup
+## PostgreSQL database setup
 
-This foundation uses `python-oracledb` with environment-driven connection settings.
+This foundation uses `psycopg` with environment-driven connection settings.
 
 Recommended variables:
 
-- `ORACLE_HOST`
-- `ORACLE_PORT`
-- `ORACLE_SERVICE_NAME`
-- `ORACLE_USERNAME`
-- `ORACLE_PASSWORD`
-- `ORACLE_MIN_POOL`
-- `ORACLE_MAX_POOL`
-- `ORACLE_INCREMENT`
+- `POSTGRES_HOST`
+- `POSTGRES_PORT`
+- `POSTGRES_DB`
+- `POSTGRES_USER`
+- `POSTGRES_PASSWORD`
+- `POSTGRES_MIN_POOL`
+- `POSTGRES_MAX_POOL`
 - `EHR_ENCRYPTION_KEY`
 - `ACCOUNT_LOCKOUT_ATTEMPTS`
 - `ACCOUNT_LOCKOUT_MINUTES`
@@ -173,7 +172,7 @@ The auth module uses:
 
 ## Audit logging and monitoring
 
-Audit logs are stored in Oracle and include user ID, timestamp, IP address, action type, entity, entity ID, and action details. The audit dashboard is available to administrators at `/audit-logs`.
+Audit logs are stored in PostgreSQL and include user ID, timestamp, IP address, action type, entity, entity ID, and action details. The audit dashboard is available to administrators at `/audit-logs`.
 
 The security monitoring dashboard at `/security-monitoring` includes failed login monitoring, locked accounts, recent security events, user activity analytics, and Chart.js visualizations.
 
@@ -192,7 +191,7 @@ Supported roles:
 
 Access is enforced at the route layer and on API endpoints. Dashboard content changes based on the signed-in role, and unauthorized access returns a 401 or 403 response depending on whether the request is unauthenticated or blocked by role policy.
 
-## Oracle SQL scripts
+## PostgreSQL SQL scripts
 
 Database scripts are stored in [`db/`](</c:/Users/lawal/Desktop/EHR/db>):
 
@@ -225,13 +224,13 @@ Set the following environment variables in Vercel before deploying:
 - `SECRET_KEY`
 - `JWT_SECRET_KEY`
 - `EHR_ENCRYPTION_KEY`
-- `ORACLE_HOST`
-- `ORACLE_PORT`
-- `ORACLE_SERVICE_NAME`
-- `ORACLE_USERNAME`
-- `ORACLE_PASSWORD`
+- `POSTGRES_HOST`
+- `POSTGRES_PORT`
+- `POSTGRES_DB`
+- `POSTGRES_USER`
+- `POSTGRES_PASSWORD`
 
-The Oracle database must be reachable from Vercel's runtime network. If the database is private, expose it through a secure network path that allows outbound connections from the function runtime.
+The PostgreSQL database must be reachable from Vercel's runtime network. If the database is private, expose it through a secure network path that allows outbound connections from the function runtime.
 
 ## Next steps
 

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from app.db.oracle import get_connection
+from app.db.postgres import get_connection
 from app.repositories.base_repository import BaseRepository
 
 
@@ -155,7 +155,6 @@ class AppointmentRepository(BaseRepository):
     ) -> int:
         with get_connection(self.pool) as connection:
             with connection.cursor() as cursor:
-                appointment_id_var = cursor.var(int)
                 cursor.execute(
                     """
                     INSERT INTO appointments (
@@ -165,7 +164,7 @@ class AppointmentRepository(BaseRepository):
                         :patient_id, :scheduled_by_user_id, :clinician_user_id, :appointment_date,
                         :appointment_type, :status, :reason, :location, :notes, SYSTIMESTAMP, SYSTIMESTAMP
                     )
-                    RETURNING appointment_id INTO :appointment_id
+                    RETURNING appointment_id
                     """,
                     {
                         "patient_id": patient_id,
@@ -177,12 +176,11 @@ class AppointmentRepository(BaseRepository):
                         "reason": reason,
                         "location": location,
                         "notes": notes,
-                        "appointment_id": appointment_id_var,
                     },
                 )
+                row = cursor.fetchone()
                 connection.commit()
-                value = appointment_id_var.getvalue()
-                return int(value[0] if isinstance(value, list) else value)
+                return int(row["appointment_id"])
 
     def update_appointment(
         self,

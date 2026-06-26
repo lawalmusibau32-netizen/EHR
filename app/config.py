@@ -12,19 +12,21 @@ def _env(name: str, default: str = "") -> str:
 
 
 @dataclass(frozen=True)
-class OracleConfig:
-    host: str = _env("ORACLE_HOST", "localhost")
-    port: int = int(_env("ORACLE_PORT", "1521"))
-    service_name: str = _env("ORACLE_SERVICE_NAME", "XE")
-    username: str = _env("ORACLE_USERNAME", "ehr_user")
-    password: str = _env("ORACLE_PASSWORD", "change_me")
-    min_pool: int = int(_env("ORACLE_MIN_POOL", "1"))
-    max_pool: int = int(_env("ORACLE_MAX_POOL", "5"))
-    increment: int = int(_env("ORACLE_INCREMENT", "1"))
+class PostgresConfig:
+    host: str = _env("POSTGRES_HOST", "localhost")
+    port: int = int(_env("POSTGRES_PORT", "5432"))
+    database: str = _env("POSTGRES_DB", "ehr")
+    username: str = _env("POSTGRES_USER", "ehr_user")
+    password: str = _env("POSTGRES_PASSWORD", "change_me")
+    min_pool: int = int(_env("POSTGRES_MIN_POOL", "1"))
+    max_pool: int = int(_env("POSTGRES_MAX_POOL", "5"))
 
     @property
     def dsn(self) -> str:
-        return f"{self.host}:{self.port}/{self.service_name}"
+        return (
+            f"host={self.host} port={self.port} dbname={self.database} "
+            f"user={self.username} password={self.password}"
+        )
 
 
 class Config:
@@ -38,7 +40,7 @@ class Config:
     ACCOUNT_LOCKOUT_MINUTES = int(_env("ACCOUNT_LOCKOUT_MINUTES", "15"))
     SESSION_TIMEOUT_MINUTES = int(_env("SESSION_TIMEOUT_MINUTES", JWT_ACCESS_TOKEN_MINUTES))
     AUTH_COOKIE_NAME = _env("AUTH_COOKIE_NAME", "ehr_access_token")
-    ORACLE = OracleConfig()
+    POSTGRES = PostgresConfig()
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = "Lax"
     SESSION_COOKIE_SECURE = _env("FLASK_ENV", "development") == "production"

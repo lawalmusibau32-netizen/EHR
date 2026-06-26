@@ -19,17 +19,17 @@ class DatabaseExtension:
         self.pool = None
 
     def init_app(self, app) -> None:
-        from app.db.oracle import create_pool
+        from app.db.postgres import create_pool
 
-        self.pool = create_pool(app.config["ORACLE"])
-        app.extensions["oracle_pool"] = self.pool
+        self.pool = create_pool(app.config["POSTGRES"])
+        app.extensions["postgres_pool"] = self.pool
 
 
 db = DatabaseExtension()
 
 
 def get_pool():
-    return current_app.extensions["oracle_pool"]
+    return current_app.extensions["postgres_pool"]
 
 
 def get_user_repository() -> UserRepository:

@@ -1,10 +1,10 @@
--- Oracle seed data for the EHR foundation
+-- PostgreSQL seed data for the EHR foundation
 -- Run after 01_schema.sql
 -- The password_hash values below are placeholders for schema/demo loading.
 -- Use the Flask registration flow to create bcrypt-backed application users.
 
-ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD';
-ALTER SESSION SET NLS_TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SS.FF3';
+
+
 
 INSERT INTO roles (role_name, description, is_system) VALUES ('Administrator', 'Platform administrator', 'Y');
 INSERT INTO roles (role_name, description, is_system) VALUES ('Doctor', 'Doctor or advanced practitioner', 'Y');
@@ -20,7 +20,7 @@ VALUES (
     'pbkdf2$sha256$demo-admin-hash',
     'demo-salt-admin',
     'Y',
-    SYSTIMESTAMP
+    NOW()
 );
 
 INSERT INTO users (role_id, username, display_name, email, password_hash, password_salt, is_active, last_login_at)
@@ -32,7 +32,7 @@ VALUES (
     'pbkdf2$sha256$demo-clinician-hash',
     'demo-salt-clinician',
     'Y',
-    SYSTIMESTAMP
+    NOW()
 );
 
 INSERT INTO users (role_id, username, display_name, email, password_hash, password_salt, is_active)
@@ -90,7 +90,7 @@ INSERT INTO medical_records (
     'Initial Consultation',
     'Baseline assessment completed. Vital signs stable. Follow-up recommended in two weeks.',
     'ACTIVE',
-    SYSTIMESTAMP
+    NOW()
 );
 
 INSERT INTO medical_records (
@@ -102,7 +102,7 @@ INSERT INTO medical_records (
     'Routine Blood Panel',
     'CBC and chemistry panel reviewed. No urgent abnormalities noted.',
     'ACTIVE',
-    SYSTIMESTAMP
+    NOW()
 );
 
 INSERT INTO appointments (
@@ -112,7 +112,7 @@ INSERT INTO appointments (
     (SELECT patient_id FROM patients WHERE mrn = 'MRN-10001'),
     (SELECT user_id FROM users WHERE username = 'reception'),
     (SELECT user_id FROM users WHERE username = 'clinician'),
-    SYSTIMESTAMP + NUMTODSINTERVAL(1, 'DAY') + NUMTODSINTERVAL(9, 'HOUR'),
+    NOW() + INTERVAL '1 day' + INTERVAL '9 hour',
     'Consultation',
     'SCHEDULED',
     'Annual review',
@@ -127,7 +127,7 @@ INSERT INTO appointments (
     (SELECT patient_id FROM patients WHERE mrn = 'MRN-10002'),
     (SELECT user_id FROM users WHERE username = 'reception'),
     (SELECT user_id FROM users WHERE username = 'clinician'),
-    SYSTIMESTAMP + NUMTODSINTERVAL(1, 'DAY') + NUMTODSINTERVAL(11, 'HOUR'),
+    NOW() + INTERVAL '1 day' + INTERVAL '11 hour',
     'Follow-up',
     'CHECKED_IN',
     'Medication review',
@@ -144,7 +144,7 @@ INSERT INTO audit_logs (
     'seed-admin-session',
     'Initial administrative access for demonstration purposes.',
     '127.0.0.1',
-    SYSTIMESTAMP
+    NOW()
 );
 
 INSERT INTO audit_logs (
@@ -156,7 +156,7 @@ INSERT INTO audit_logs (
     '1',
     'Created first encounter record for MRN-10001.',
     '127.0.0.1',
-    SYSTIMESTAMP
+    NOW()
 );
 
 INSERT INTO audit_logs (
@@ -168,7 +168,7 @@ INSERT INTO audit_logs (
     '1',
     'Scheduled consultation for MRN-10001.',
     '127.0.0.1',
-    SYSTIMESTAMP
+    NOW()
 );
 
 COMMIT;
