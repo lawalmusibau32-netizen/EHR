@@ -11,8 +11,17 @@ def _env(name: str, default: str = "") -> str:
     return os.getenv(name, default)
 
 
+def _first_env(*names: str, default: str = "") -> str:
+    for name in names:
+        value = os.getenv(name)
+        if value:
+            return value
+    return default
+
+
 @dataclass(frozen=True)
 class PostgresConfig:
+    url: str = _first_env("DATABASE_URL", "POSTGRES_URL", "POSTGRES_PRISMA_URL")
     host: str = _env("POSTGRES_HOST", "localhost")
     port: int = int(_env("POSTGRES_PORT", "5432"))
     database: str = _env("POSTGRES_DB", "ehr")
@@ -23,6 +32,8 @@ class PostgresConfig:
 
     @property
     def dsn(self) -> str:
+        if self.url:
+            return self.url
         return (
             f"host={self.host} port={self.port} dbname={self.database} "
             f"user={self.username} password={self.password}"

@@ -87,8 +87,12 @@
           </div>
         </div>
       </nav>
-
       <main class="content-wrap">
+  {% else %}
+  <main class="auth-shell">
+    <div class="auth-frame">
+  {% endif %}
+
         {% with messages = get_flashed_messages(with_categories=true) %}
           {% if messages %}
             <div class="flash-stack mb-3">
@@ -101,8 +105,9 @@
           {% endif %}
         {% endwith %}
         {% block content %}{% endblock %}
-      </main>
 
+  {% if request.blueprint != 'auth' %}
+      </main>
       <footer class="app-footer">
         <div>HealthIQ EHR</div>
         <div class="text-muted">Built for secure clinical workflows and future expansion.</div>
@@ -110,20 +115,6 @@
     </div>
   </div>
   {% else %}
-  <main class="auth-shell">
-    <div class="auth-frame">
-      {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-          <div class="flash-stack mb-3">
-            {% for category, message in messages %}
-              <div class="alert alert-{{ category if category in ['success', 'danger', 'warning', 'info'] else 'info' }} mb-0" role="alert">
-                {{ message }}
-              </div>
-            {% endfor %}
-          </div>
-        {% endif %}
-      {% endwith %}
-      {% block content %}{% endblock %}
       <footer class="auth-footer text-center text-muted">
         HealthIQ EHR
       </footer>
