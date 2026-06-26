@@ -1,0 +1,22 @@
+{% macro stat_card(label, value, delta='', tone='primary') -%}
+<div class="stat-card stat-{{ tone }}">
+  <div class="stat-label">{{ label }}</div>
+  <div class="stat-value">{{ value }}</div>
+  {% if delta %}<div class="stat-delta">{{ delta }}</div>{% endif %}
+</div>
+{%- endmacro %}
+
+{% macro section_header(title, subtitle='', action_label='') -%}
+<div class="section-header">
+  <div>
+    <h2 class="section-title">{{ title }}</h2>
+    {% if subtitle %}<p class="section-subtitle">{{ subtitle }}</p>{% endif %}
+  </div>
+  {% if action_label %}<button class="btn btn-outline-primary btn-sm">{{ action_label }}</button>{% endif %}
+</div>
+{%- endmacro %}
+
+{% macro nav_item(endpoint, label) -%}
+<a class="nav-link {% if request.endpoint == endpoint %}active{% endif %}" href="{{ url_for(endpoint) }}">{{ label }}</a>
+{%- endmacro %}
+

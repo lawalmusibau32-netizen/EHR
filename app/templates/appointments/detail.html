@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Appointment | HealthIQ{% endblock %}
+{% block page_title %}Appointment Detail{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+  <div class="col-12 col-xl-8">
+    <div class="card panel-card">
+      <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap mb-4">
+          <div>
+            <h2 class="section-title mb-1">{{ appointment.appointment_type }}</h2>
+            <p class="section-subtitle mb-0">{{ appointment.patient_last_name }}, {{ appointment.patient_first_name }} - {{ appointment.mrn }}</p>
+          </div>
+          <div class="d-flex gap-2 flex-wrap">
+            {% if appointment.status != 'CANCELLED' %}
+            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('appointments.reschedule', appointment_id=appointment.appointment_id) }}">Reschedule</a>
+            {% endif %}
+            <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('appointments.index') }}">Back</a>
+          </div>
+        </div>
+
+        <div class="detail-grid mb-4">
+          <div><span>Date</span><strong>{{ appointment.appointment_date.strftime('%Y-%m-%d') if appointment.appointment_date else 'N/A' }}</strong></div>
+          <div><span>Time</span><strong>{{ appointment.appointment_date.strftime('%H:%M') if appointment.appointment_date else 'N/A' }}</strong></div>
+          <div><span>Status</span><strong>{{ appointment.status.replace('_', ' ').title() }}</strong></div>
+          <div><span>Clinician</span><strong>{{ appointment.clinician_name or 'Unassigned' }}</strong></div>
+        </div>
+
+        <div class="detail-grid">
+          <div><span>Location</span><strong>{{ appointment.location or 'N/A' }}</strong></div>
+          <div><span>Scheduled by</span><strong>{{ appointment.scheduled_by_name }}</strong></div>
+          <div><span>Phone</span><strong>{{ appointment.patient_phone_number or 'N/A' }}</strong></div>
+          <div><span>Email</span><strong>{{ appointment.patient_email or 'N/A' }}</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-xl-4">
+    <div class="card panel-card h-100">
+      <div class="card-body p-4">
+        <h3 class="section-title mb-3">Visit Notes</h3>
+        <p class="text-muted">{{ appointment.reason or 'No reason recorded.' }}</p>
+        {% if appointment.notes %}
+        <div class="border-top pt-3 mt-3">{{ appointment.notes }}</div>
+        {% endif %}
+
+        {% if appointment.status != 'CANCELLED' %}
+        <form class="mt-4" method="post" action="{{ url_for('appointments.cancel', appointment_id=appointment.appointment_id) }}" onsubmit="return confirm('Cancel this appointment?');">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <label class="form-label" for="cancel_note">Cancellation note</label>
+          <textarea class="form-control mb-3" id="cancel_note" name="cancel_note" rows="3"></textarea>
+          <button class="btn btn-outline-danger w-100" type="submit">Cancel appointment</button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

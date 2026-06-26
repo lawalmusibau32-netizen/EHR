@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Login | Secure EHR{% endblock %}
+{% block page_title %}Login{% endblock %}
+
+{% block content %}
+<div class="login-grid">
+  <section class="login-hero">
+    <div class="eyebrow text-white-50">HealthIQ EHR</div>
+    <h1>Secure care coordination for modern health systems.</h1>
+    <p>
+      Centralize patient access, record review, scheduling, and audit visibility in a responsive
+      clinical workspace.
+    </p>
+    <div class="login-points">
+      <span>Role-based access</span>
+      <span>Audit ready</span>
+      <span>Oracle-backed</span>
+    </div>
+    <p class="mt-3 text-white-50 small">User registration is restricted to administrators.</p>
+  </section>
+  <section class="login-panel card panel-card">
+    <div class="card-body">
+      <h2 class="h4 mb-2">Sign in</h2>
+      <p class="text-muted mb-4">Use your assigned clinical or administrative credentials.</p>
+      <form method="post" class="stack-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <div>
+          <label class="form-label" for="username">Username</label>
+          <input class="form-control form-control-lg" id="username" name="username" autocomplete="username">
+        </div>
+        <div>
+          <label class="form-label" for="password">Password</label>
+          <input class="form-control form-control-lg" id="password" type="password" name="password" autocomplete="current-password">
+        </div>
+        <div>
+          <label class="form-label" for="mfa_code">MFA code</label>
+          <input class="form-control form-control-lg" id="mfa_code" name="mfa_code" inputmode="numeric" autocomplete="one-time-code" placeholder="Required when enabled">
+        </div>
+        <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="remember">
+            <label class="form-check-label" for="remember">Remember this device</label>
+          </div>
+          <span class="small text-muted">Administrator registration only</span>
+        </div>
+        <button class="btn btn-primary btn-lg w-100" type="submit">Sign in</button>
+      </form>
+    </div>
+  </section>
+</div>
+{% endblock %}

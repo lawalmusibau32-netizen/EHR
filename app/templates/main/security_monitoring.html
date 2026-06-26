@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Security Monitoring | HealthIQ{% endblock %}
+{% block page_title %}Security Monitoring{% endblock %}
+
+{% block content %}
+{% import "components.html" as ui %}
+
+{{ ui.section_header('Security Monitoring', 'Monitor failed logins, user activity, audit analytics, and alerts.') }}
+
+<div class="stats-grid mb-4">
+  {{ ui.stat_card('Failed Logins', failed_login_total, 'All recorded attempts', 'warning') }}
+  {{ ui.stat_card('Security Events', security_events|length, 'Recent security stream', 'info') }}
+  {{ ui.stat_card('Audit Types', action_summary|length, 'Tracked event categories', 'success') }}
+  {{ ui.stat_card('Locked Accounts', locked_accounts|length, 'Currently within lockout window', 'warning') }}
+</div>
+
+<div class="row g-4">
+  <div class="col-12 col-xl-7">
+    <div class="card panel-card">
+      <div class="card-body">
+        <h2 class="section-title mb-3">Audit Log Analytics</h2>
+        <canvas id="auditChart" height="140"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-xl-5">
+    <div class="card panel-card h-100">
+      <div class="card-body">
+        <h2 class="section-title mb-3">Security Alerts</h2>
+        {% if locked_accounts %}
+        <div class="alert alert-warning">
+          {{ locked_accounts|length }} account{{ '' if locked_accounts|length == 1 else 's' }} currently locked.
+        </div>
+        {% endif %}
+        <div class="audit-stream">
+          {% for event in security_events %}
+          <div class="audit-row">
+            <span class="audit-dot warning"></span>
+            <div>
+              <strong>{{ event.action_type }}</strong>
+              <div class="text-muted">{{ event.details or event.entity_name ~ ' #' ~ event.entity_id }}</div>
+              <div class="small text-muted">{{ event.ip_address or 'Unknown IP' }} - {{ event.created_at.strftime('%Y-%m-%d %H:%M') if event.created_at else '' }}</div>
+            </div>
+          </div>
+          {% else %}
+          <div class="text-muted">No security events found.</div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+  const ctx = document.getElementById('auditChart');
+  if (ctx) {
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: {{ chart_labels|tojson }},
+        datasets: [{
+          label: 'Events',
+          data: {{ chart_values|tojson }},
+          backgroundColor: ['#0b7285', '#22c55e', '#f59e0b', '#ef4444', '#38bdf8', '#64748b']
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+      }
+    });
+  }
+</script>
+{% endblock %}

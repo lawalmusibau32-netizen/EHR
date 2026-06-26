@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}{{ patient.last_name }}, {{ patient.first_name }} | Secure EHR{% endblock %}
+{% block page_title %}Patient Profile{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+  <div class="col-12 col-xl-8">
+    <div class="card panel-card">
+      <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap mb-4">
+          <div>
+            <h2 class="section-title mb-1">{{ patient.last_name }}, {{ patient.first_name }}</h2>
+            <p class="section-subtitle mb-0">Patient profile and demographic summary.</p>
+          </div>
+          <div class="d-flex gap-2 flex-wrap">
+            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('patients.edit_patient', patient_id=patient.patient_id) }}">Edit</a>
+            <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('patients.index') }}">Back</a>
+          </div>
+        </div>
+
+        <div class="detail-grid mb-4">
+          <div><span>MRN</span><strong>{{ patient.mrn }}</strong></div>
+          <div><span>Date of birth</span><strong>{{ patient.date_of_birth.strftime('%Y-%m-%d') if patient.date_of_birth else 'N/A' }}</strong></div>
+          <div><span>Sex</span><strong>{{ patient.sex }}</strong></div>
+          <div><span>Status</span><strong>{{ 'Active' if patient.is_active == 'Y' else 'Inactive' }}</strong></div>
+        </div>
+
+        <div class="detail-grid">
+          <div><span>Phone</span><strong>{{ patient.phone_number or 'N/A' }}</strong></div>
+          <div><span>Email</span><strong>{{ patient.email or 'N/A' }}</strong></div>
+          <div><span>City</span><strong>{{ patient.city or 'N/A' }}</strong></div>
+          <div><span>Region</span><strong>{{ patient.region or 'N/A' }}</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-xl-4">
+    <div class="card panel-card h-100">
+      <div class="card-body p-4">
+        <h3 class="section-title mb-3">Activity</h3>
+        <div class="stacked-metrics">
+          <div class="metric-line"><span>Clinical records</span><strong>{{ patient.record_count or 0 }}</strong></div>
+          <div class="metric-line"><span>Appointments</span><strong>{{ patient.appointment_count or 0 }}</strong></div>
+        </div>
+        {% if current_user.role_key == 'administrator' and patient.is_active == 'Y' %}
+        <form class="mt-4" method="post" action="{{ url_for('patients.delete_patient', patient_id=patient.patient_id) }}" onsubmit="return confirm('Deactivate this patient?');">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button class="btn btn-outline-danger w-100" type="submit">Deactivate patient</button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

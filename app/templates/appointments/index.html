@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Appointments | HealthIQ{% endblock %}
+{% block page_title %}Appointments{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-end gap-3 mb-4">
+  <div>
+    <h2 class="section-title mb-1">Appointment Management</h2>
+    <p class="section-subtitle mb-0">Schedule, reschedule, cancel, and review patient appointments.</p>
+  </div>
+  <a class="btn btn-primary" href="{{ url_for('appointments.new_appointment') }}">Schedule Appointment</a>
+</div>
+
+<div class="card panel-card mb-4">
+  <div class="card-body">
+    <form method="get" class="row g-3 align-items-end">
+      <div class="col-12 col-lg-4">
+        <label class="form-label" for="q">Search</label>
+        <input class="form-control" id="q" type="search" name="q" value="{{ search }}" placeholder="Patient, MRN, clinician, reason">
+      </div>
+      <div class="col-12 col-md-4 col-lg-3">
+        <label class="form-label" for="status">Status</label>
+        <select class="form-select" id="status" name="status">
+          <option value="">All statuses</option>
+          {% for status in statuses %}
+          <option value="{{ status }}" {% if selected_status == status %}selected{% endif %}>{{ status.replace('_', ' ').title() }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-12 col-md-4 col-lg-3">
+        <label class="form-label" for="patient_id">Patient</label>
+        <select class="form-select" id="patient_id" name="patient_id">
+          <option value="">All patients</option>
+          {% for patient in patients %}
+          <option value="{{ patient.patient_id }}" {% if selected_patient_id|string == patient.patient_id|string %}selected{% endif %}>
+            {{ patient.last_name }}, {{ patient.first_name }} - {{ patient.mrn }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-12 col-md-4 col-lg-2 d-grid">
+        <button class="btn btn-outline-primary" type="submit">Apply</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card panel-card">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Patient</th>
+            <th>Visit</th>
+            <th>Clinician</th>
+            <th>Status</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for appointment in appointments %}
+          <tr>
+            <td>
+              <div class="fw-semibold">{{ appointment.appointment_date.strftime('%Y-%m-%d') if appointment.appointment_date else '' }}</div>
+              <div class="text-muted small">{{ appointment.appointment_date.strftime('%H:%M') if appointment.appointment_date else '' }}</div>
+            </td>
+            <td>
+              <div class="fw-semibold">{{ appointment.patient_last_name }}, {{ appointment.patient_first_name }}</div>
+              <div class="text-muted small">{{ appointment.mrn }}</div>
+            </td>
+            <td>
+              <div>{{ appointment.appointment_type }}</div>
+              <div class="text-muted small">{{ appointment.reason or appointment.location or 'No reason recorded' }}</div>
+            </td>
+            <td>{{ appointment.clinician_name or 'Unassigned' }}</td>
+            <td>
+              {% set badge = 'secondary' %}
+              {% if appointment.status == 'SCHEDULED' %}{% set badge = 'primary' %}{% endif %}
+              {% if appointment.status == 'CHECKED_IN' %}{% set badge = 'success' %}{% endif %}
+              {% if appointment.status == 'CANCELLED' %}{% set badge = 'danger' %}{% endif %}
+              {% if appointment.status == 'NO_SHOW' %}{% set badge = 'warning' %}{% endif %}
+              <span class="badge text-bg-{{ badge }}">{{ appointment.status.replace('_', ' ').title() }}</span>
+            </td>
+            <td>
+              <div class="d-flex justify-content-end gap-2 flex-wrap">
+                <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('appointments.detail', appointment_id=appointment.appointment_id) }}">View</a>
+                {% if appointment.status != 'CANCELLED' %}
+                <a class="btn btn-outline-primary btn-sm" href="{{ url_for('appointments.reschedule', appointment_id=appointment.appointment_id) }}">Reschedule</a>
+                <form method="post" action="{{ url_for('appointments.cancel', appointment_id=appointment.appointment_id) }}" onsubmit="return confirm('Cancel this appointment?');">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                  <button class="btn btn-outline-danger btn-sm" type="submit">Cancel</button>
+                </form>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="6" class="text-muted">No appointments found.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

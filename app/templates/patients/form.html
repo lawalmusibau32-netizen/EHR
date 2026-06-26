@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}{{ action }} | Secure EHR{% endblock %}
+{% block page_title %}Patients{% endblock %}
+
+{% block content %}
+{% set p = patient or {} %}
+<div class="row justify-content-center">
+  <div class="col-12 col-xl-9">
+    <div class="card panel-card">
+      <div class="card-body p-4 p-lg-5">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">{{ action }}</h2>
+            <p class="section-subtitle">Complete the patient demographics and contact details below.</p>
+          </div>
+          {% if patient %}
+          <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('patients.profile', patient_id=patient.patient_id) }}">View profile</a>
+          {% endif %}
+        </div>
+
+        <form method="post" class="row g-3">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <div class="col-12 col-md-6">
+            <label class="form-label" for="mrn">MRN</label>
+            <input class="form-control" id="mrn" name="mrn" value="{{ p.mrn or '' }}" required maxlength="30">
+          </div>
+          <div class="col-12 col-md-6">
+            <label class="form-label" for="date_of_birth">Date of birth</label>
+            <input class="form-control" id="date_of_birth" name="date_of_birth" type="date" value="{{ p.date_of_birth.strftime('%Y-%m-%d') if p.date_of_birth else '' }}" required>
+          </div>
+          <div class="col-12 col-md-6">
+            <label class="form-label" for="first_name">First name</label>
+            <input class="form-control" id="first_name" name="first_name" value="{{ p.first_name or '' }}" required>
+          </div>
+          <div class="col-12 col-md-6">
+            <label class="form-label" for="last_name">Last name</label>
+            <input class="form-control" id="last_name" name="last_name" value="{{ p.last_name or '' }}" required>
+          </div>
+          <div class="col-12 col-md-4">
+            <label class="form-label" for="sex">Sex</label>
+            <select class="form-select" id="sex" name="sex" required>
+              {% for option in ['Male', 'Female', 'Other'] %}
+              <option value="{{ option }}" {% if (p.sex or '') == option %}selected{% endif %}>{{ option }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-12 col-md-4">
+            <label class="form-label" for="phone_number">Phone</label>
+            <input class="form-control" id="phone_number" name="phone_number" value="{{ p.phone_number or '' }}" maxlength="30">
+          </div>
+          <div class="col-12 col-md-4">
+            <label class="form-label" for="email">Email</label>
+            <input class="form-control" id="email" type="email" name="email" value="{{ p.email or '' }}" maxlength="255">
+          </div>
+          <div class="col-12">
+            <label class="form-label" for="address_line1">Address line 1</label>
+            <input class="form-control" id="address_line1" name="address_line1" value="{{ p.address_line1 or '' }}">
+          </div>
+          <div class="col-12">
+            <label class="form-label" for="address_line2">Address line 2</label>
+            <input class="form-control" id="address_line2" name="address_line2" value="{{ p.address_line2 or '' }}">
+          </div>
+          <div class="col-12 col-md-4">
+            <label class="form-label" for="city">City</label>
+            <input class="form-control" id="city" name="city" value="{{ p.city or '' }}">
+          </div>
+          <div class="col-12 col-md-4">
+            <label class="form-label" for="region">Region</label>
+            <input class="form-control" id="region" name="region" value="{{ p.region or '' }}">
+          </div>
+          <div class="col-12 col-md-4">
+            <label class="form-label" for="country">Country</label>
+            <input class="form-control" id="country" name="country" value="{{ p.country or 'Ghana' }}">
+          </div>
+          {% if patient and current_user.role_key == 'administrator' %}
+          <div class="col-12">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="Y" {% if p.is_active == 'Y' %}checked{% endif %}>
+              <label class="form-check-label" for="is_active">Patient is active</label>
+            </div>
+          </div>
+          {% endif %}
+          <div class="col-12 d-flex gap-2 flex-wrap">
+            <button class="btn btn-primary" type="submit">{{ submit_label }}</button>
+            <a class="btn btn-outline-secondary" href="{{ url_for('patients.index') }}">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

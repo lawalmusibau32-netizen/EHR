@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Medical Records | HealthIQ{% endblock %}
+{% block page_title %}Medical Records{% endblock %}
+
+{% block content %}
+{% import "components.html" as ui %}
+
+{{ ui.section_header('Medical Records', 'Access encounter history, diagnoses, labs, and documentation in one place.', 'New Record') }}
+
+<div class="row g-4">
+  <div class="col-12 col-xl-3">
+    <div class="card panel-card">
+      <div class="card-body">
+        <div class="filter-stack">
+          <input class="form-control" placeholder="Search records">
+          <select class="form-select">
+            <option>All record types</option>
+            <option>Encounter notes</option>
+            <option>Lab results</option>
+            <option>Imaging</option>
+          </select>
+          <button class="btn btn-primary w-100">Apply Filters</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-xl-9">
+    <div class="card panel-card">
+      <div class="card-body">
+        <div class="timeline">
+          <article class="timeline-item">
+            <div class="timeline-badge">ENC</div>
+            <div>
+              <h3>Follow-up Consultation</h3>
+              <p>Clinical note, plan, and medication review recorded for patient chart.</p>
+            </div>
+          </article>
+          <article class="timeline-item">
+            <div class="timeline-badge">LAB</div>
+            <div>
+              <h3>Blood Panel Result</h3>
+              <p>Incoming lab data with review status, reference range, and sign-off history.</p>
+            </div>
+          </article>
+          <article class="timeline-item">
+            <div class="timeline-badge">IMG</div>
+            <div>
+              <h3>Radiology Report</h3>
+              <p>Imaging summary available for secure review and annotation.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

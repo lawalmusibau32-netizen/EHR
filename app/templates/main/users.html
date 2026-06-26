@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}User Management | HealthIQ{% endblock %}
+{% block page_title %}User Management{% endblock %}
+
+{% block content %}
+{% import "components.html" as ui %}
+
+{{ ui.section_header('User Management', 'Assign roles, review access, and support administration workflows.', 'Add User') }}
+
+<div class="row g-4">
+  <div class="col-12 col-xl-4">
+    <div class="card panel-card">
+      <div class="card-body">
+        <div class="user-summary">
+          <div class="avatar avatar-admin">A</div>
+          <div>
+            <strong>Administrator</strong>
+            <div class="text-muted">Full platform access</div>
+          </div>
+        </div>
+        <hr>
+        <div class="user-summary">
+          <div class="avatar avatar-clinical">D</div>
+          <div>
+            <strong>Doctor</strong>
+            <div class="text-muted">Charting and clinical review</div>
+          </div>
+        </div>
+        <hr>
+        <div class="user-summary">
+          <div class="avatar avatar-support">N</div>
+          <div>
+            <strong>Nurse</strong>
+            <div class="text-muted">Clinical support and task follow-through</div>
+          </div>
+        </div>
+        <hr>
+        <div class="user-summary">
+          <div class="avatar avatar-support">R</div>
+          <div>
+            <strong>Receptionist</strong>
+            <div class="text-muted">Scheduling and registration</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-xl-8">
+    <div class="card panel-card">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table align-middle">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Last Login</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Dr. Maya Clarke</td>
+                <td>Doctor</td>
+                <td><span class="badge text-bg-success">Active</span></td>
+                <td>Today, 08:42</td>
+              </tr>
+              <tr>
+                <td>Nurse Jordan Lee</td>
+                <td>Nurse</td>
+                <td><span class="badge text-bg-success">Active</span></td>
+                <td>Today, 07:55</td>
+              </tr>
+              <tr>
+                <td>Grace Mensah</td>
+                <td>Receptionist</td>
+                <td><span class="badge text-bg-secondary">Limited</span></td>
+                <td>Yesterday</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

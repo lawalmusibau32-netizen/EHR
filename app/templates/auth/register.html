@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Register | Secure EHR{% endblock %}
+{% block page_title %}Register{% endblock %}
+
+{% block content %}
+<div class="login-grid">
+  <section class="login-hero">
+    <div class="eyebrow text-white-50">HealthIQ EHR</div>
+    <h1>Create secure access for clinical and administrative staff.</h1>
+    <p>
+      Register users with strong password rules, bcrypt hashing, JWT-backed sessions, and role-based access.
+    </p>
+    <div class="login-points">
+      <span>bcrypt hashing</span>
+      <span>JWT access tokens</span>
+      <span>Session revocation</span>
+    </div>
+  </section>
+  <section class="login-panel card panel-card">
+    <div class="card-body">
+      <h2 class="h4 mb-2">Create account</h2>
+      <p class="text-muted mb-4">Use an approved role and a strong password.</p>
+      <form method="post" class="stack-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <div>
+          <label class="form-label" for="display_name">Display name</label>
+          <input class="form-control form-control-lg" id="display_name" name="display_name" autocomplete="name">
+        </div>
+        <div>
+          <label class="form-label" for="username">Username</label>
+          <input class="form-control form-control-lg" id="username" name="username" autocomplete="username">
+        </div>
+        <div>
+          <label class="form-label" for="email">Email</label>
+          <input class="form-control form-control-lg" id="email" type="email" name="email" autocomplete="email">
+        </div>
+        <div>
+          <label class="form-label" for="role_name">Role</label>
+          <select class="form-select form-select-lg" id="role_name" name="role_name">
+            <option value="">Select role</option>
+            {% for role in roles %}
+            <option value="{{ role.role_name }}">{{ role.role_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label class="form-label" for="password">Password</label>
+          <input class="form-control form-control-lg" id="password" type="password" name="password" autocomplete="new-password">
+        </div>
+        <button class="btn btn-primary btn-lg w-100" type="submit">Register</button>
+        <a class="text-center small text-decoration-none" href="{{ url_for('auth.login') }}">Back to login</a>
+      </form>
+    </div>
+  </section>
+</div>
+{% endblock %}

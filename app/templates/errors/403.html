@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Forbidden | HealthIQ{% endblock %}
+{% block page_title %}Forbidden{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-7 col-xl-6">
+    <div class="card panel-card">
+      <div class="card-body p-4 p-lg-5 text-center">
+        <div class="eyebrow mb-2">403</div>
+        <h1 class="h3 mb-3">Access denied</h1>
+        <p class="text-muted mb-4">
+          {{ message or 'Your current role does not have permission to open this page.' }}
+        </p>
+        {% if required_roles %}
+        <p class="small text-muted mb-4">
+          Allowed roles: {{ required_roles | join(', ') }}
+        </p>
+        {% endif %}
+        <a class="btn btn-outline-primary" href="{{ url_for('main.dashboard') }}">Back to dashboard</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

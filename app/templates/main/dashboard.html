@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | HealthIQ{% endblock %}
+{% block page_title %}{{ dashboard_role|capitalize }} Dashboard{% endblock %}
+
+{% block content %}
+{% import "components.html" as ui %}
+
+<section class="dashboard-grid">
+  <div class="hero-panel">
+    <div>
+      <div class="eyebrow">{{ dashboard_role|capitalize }} workspace</div>
+      {% if dashboard_role == 'administrator' %}
+      <h2>Govern access, security, and operational flow.</h2>
+      <p>Monitor system activity, audit trails, users, appointments, and security posture from one command view.</p>
+      {% elif dashboard_role == 'doctor' %}
+      <h2>Focus on clinical decisions and documentation.</h2>
+      <p>Review active patients, appointments, records, and recent chart activity.</p>
+      {% elif dashboard_role == 'nurse' %}
+      <h2>Coordinate care tasks and patient movement.</h2>
+      <p>Keep checked-in patients, active visits, and care follow-up visible.</p>
+      {% else %}
+      <h2>Keep scheduling and registration moving.</h2>
+      <p>Track appointments, patient lookup, cancellations, and front desk activity.</p>
+      {% endif %}
+    </div>
+    <div class="hero-actions">
+      {% if dashboard_role == 'administrator' %}
+      <a class="btn btn-light" href="{{ url_for('main.audit_logs') }}">Audit Logs</a>
+      <a class="btn btn-outline-light" href="{{ url_for('main.security_monitoring') }}">Security</a>
+      {% elif dashboard_role == 'doctor' %}
+      <a class="btn btn-light" href="{{ url_for('main.records') }}">Medical Records</a>
+      <a class="btn btn-outline-light" href="{{ url_for('appointments.index') }}">Appointments</a>
+      {% elif dashboard_role == 'nurse' %}
+      <a class="btn btn-light" href="{{ url_for('appointments.index') }}">Appointments</a>
+      <a class="btn btn-outline-light" href="{{ url_for('patients.index') }}">Patients</a>
+      {% else %}
+      <a class="btn btn-light" href="{{ url_for('appointments.new_appointment') }}">Schedule</a>
+      <a class="btn btn-outline-light" href="{{ url_for('patients.index') }}">Patients</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    {% for stat in dashboard.stats %}
+      {{ ui.stat_card(stat.label, stat.value, '', stat.tone) }}
+    {% endfor %}
+  </div>
+
+  <div class="row g-4">
+    <div class="col-12 col-xl-4">
+      <div class="card panel-card h-100">
+        <div class="card-body">
+          {{ ui.section_header('Quick Actions') }}
+          <div class="d-grid gap-2">
+            <a class="btn btn-outline-primary" href="{{ url_for('patients.index') }}">Find Patient</a>
+            <a class="btn btn-outline-primary" href="{{ url_for('appointments.index') }}">View Appointments</a>
+            {% if dashboard_role in ['administrator', 'doctor', 'receptionist'] %}
+            <a class="btn btn-outline-primary" href="{{ url_for('patients.new_patient') }}">Add Patient</a>
+            {% endif %}
+            {% if dashboard_role == 'administrator' %}
+            <a class="btn btn-outline-danger" href="{{ url_for('main.security_monitoring') }}">Review Security Alerts</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-xl-4">
+      <div class="card panel-card h-100">
+        <div class="card-body">
+          {{ ui.section_header('Notifications') }}
+          <div class="stacked-metrics">
+            {% for item in dashboard.notifications %}
+            <div class="metric-line">
+              <span>{{ item.title }}</span>
+              <strong class="text-{{ item.tone }}">{{ item.message }}</strong>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-xl-4">
+      <div class="card panel-card h-100">
+        <div class="card-body">
+          {{ ui.section_header('Recent Activity') }}
+          <div class="audit-stream">
+            {% for activity in dashboard.recent_activity %}
+            <div class="audit-row">
+              <span class="audit-dot info"></span>
+              <div>
+                <strong>{{ activity.action_type }} {{ activity.entity_name }}</strong>
+                <div class="text-muted">{{ activity.details or activity.entity_id }}</div>
+              </div>
+            </div>
+            {% else %}
+            <div class="text-muted">No recent activity yet.</div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

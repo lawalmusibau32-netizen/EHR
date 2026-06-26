@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}{{ action }} | HealthIQ{% endblock %}
+{% block page_title %}Appointments{% endblock %}
+
+{% block content %}
+{% set a = appointment or {} %}
+<div class="row justify-content-center">
+  <div class="col-12 col-xl-9">
+    <div class="card panel-card">
+      <div class="card-body p-4 p-lg-5">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">{{ action }}</h2>
+            <p class="section-subtitle">Coordinate patient visits, clinician assignment, and visit location.</p>
+          </div>
+          {% if appointment %}
+          <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('appointments.detail', appointment_id=appointment.appointment_id) }}">View appointment</a>
+          {% endif %}
+        </div>
+
+        <form method="post" class="row g-3">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <div class="col-12 col-lg-6">
+            <label class="form-label" for="patient_id">Patient</label>
+            <select class="form-select" id="patient_id" name="patient_id" required>
+              <option value="">Select patient</option>
+              {% for patient in patients %}
+              <option value="{{ patient.patient_id }}" {% if a.patient_id|string == patient.patient_id|string %}selected{% endif %}>
+                {{ patient.last_name }}, {{ patient.first_name }} - {{ patient.mrn }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-12 col-lg-6">
+            <label class="form-label" for="clinician_user_id">Clinician</label>
+            <select class="form-select" id="clinician_user_id" name="clinician_user_id">
+              <option value="">Unassigned</option>
+              {% for clinician in clinicians %}
+              <option value="{{ clinician.user_id }}" {% if a.clinician_user_id|string == clinician.user_id|string %}selected{% endif %}>
+                {{ clinician.display_name }} - {{ clinician.role_name }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-12 col-md-6">
+            <label class="form-label" for="appointment_date">Date and time</label>
+            <input class="form-control" id="appointment_date" name="appointment_date" type="datetime-local" value="{{ a.appointment_date.strftime('%Y-%m-%dT%H:%M') if a.appointment_date else '' }}" required>
+          </div>
+          <div class="col-12 col-md-6">
+            <label class="form-label" for="appointment_type">Type</label>
+            <select class="form-select" id="appointment_type" name="appointment_type" required>
+              <option value="">Select type</option>
+              {% for type in appointment_types %}
+              <option value="{{ type }}" {% if a.appointment_type == type %}selected{% endif %}>{{ type }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-12 col-md-6">
+            <label class="form-label" for="status">Status</label>
+            <select class="form-select" id="status" name="status">
+              {% for status in statuses %}
+              <option value="{{ status }}" {% if (a.status or 'SCHEDULED') == status %}selected{% endif %}>{{ status.replace('_', ' ').title() }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-12 col-md-6">
+            <label class="form-label" for="location">Location</label>
+            <input class="form-control" id="location" name="location" value="{{ a.location or '' }}" maxlength="120">
+          </div>
+          <div class="col-12">
+            <label class="form-label" for="reason">Reason</label>
+            <input class="form-control" id="reason" name="reason" value="{{ a.reason or '' }}" maxlength="255">
+          </div>
+          <div class="col-12">
+            <label class="form-label" for="notes">Notes</label>
+            <textarea class="form-control" id="notes" name="notes" rows="4">{{ a.notes or '' }}</textarea>
+          </div>
+          <div class="col-12 d-flex gap-2 flex-wrap">
+            <button class="btn btn-primary" type="submit">{{ submit_label }}</button>
+            <a class="btn btn-outline-secondary" href="{{ url_for('appointments.index') }}">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
