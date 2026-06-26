@@ -3,5 +3,5 @@
 __pycache__/
 **/__pycache__/
 *.pyc
-db/
+/db/
 run.py
