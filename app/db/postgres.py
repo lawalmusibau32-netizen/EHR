@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import re
 from contextlib import contextmanager
 from typing import Any
@@ -102,6 +103,12 @@ class _ConnectionProxy:
 
 
 def create_pool(postgres_config):
+    is_production = os.getenv("VERCEL") == "1" or os.getenv("FLASK_ENV") == "production"
+    if is_production and not postgres_config.url:
+        raise RuntimeError(
+            "PostgreSQL connection is not configured for production. "
+            "Set DATABASE_URL, POSTGRES_URL, or POSTGRES_PRISMA_URL in Vercel."
+        )
     return ConnectionPool(
         conninfo=postgres_config.dsn,
         min_size=postgres_config.min_pool,

@@ -230,6 +230,8 @@ Set the following environment variables in Vercel before deploying:
 - `POSTGRES_USER`
 - `POSTGRES_PASSWORD`
 
+If you are using a hosted PostgreSQL service, set `DATABASE_URL` instead of host/user/password values. The app will prefer `DATABASE_URL`, `POSTGRES_URL`, or `POSTGRES_PRISMA_URL` in production and will fail fast if none are set.
+
 The PostgreSQL database must be reachable from Vercel's runtime network. If the database is private, expose it through a secure network path that allows outbound connections from the function runtime.
 
 ## Next steps
