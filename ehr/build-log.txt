@@ -1,0 +1,57 @@
+npm warn Unknown cli config "--webpack". This will stop working in the next major version of npm.
+
+> ehr-next@0.1.0 build
+> next build --webpack
+
+Γû▓ Next.js 16.2.10 (webpack)
+- Environments: .env
+
+  Creating an optimized production build ...
+Γ£ô Compiled successfully in 8.0s
+  Skipping validation of types
+  Finished TypeScript config validation in 16ms ...
+  Collecting page data using 3 workers ...
+  Generating static pages using 3 workers (0/23) ...
+  Generating static pages using 3 workers (5/23) 
+  Generating static pages using 3 workers (11/23) 
+  Generating static pages using 3 workers (17/23) 
+Γ£ô Generating static pages using 3 workers (23/23) in 1954ms
+  Finalizing page optimization ...
+  Collecting build traces ...
+
+Route (app)
+Γöî ╞Æ /
+Γö£ Γùï /_not-found
+Γö£ ╞Æ /api/appointments
+Γö£ ╞Æ /api/appointments/[id]
+Γö£ ╞Æ /api/auth/login
+Γö£ ╞Æ /api/auth/logout
+Γö£ ╞Æ /api/auth/me
+Γö£ ╞Æ /api/auth/register
+Γö£ ╞Æ /api/patients
+Γö£ ╞Æ /api/patients/[id]
+Γö£ ╞Æ /api/records
+Γö£ ╞Æ /api/records/[id]
+Γö£ ╞Æ /appointments
+Γö£ ╞Æ /appointments/[id]
+Γö£ ╞Æ /appointments/new
+Γö£ ╞Æ /audit-logs
+Γö£ ╞Æ /dashboard
+Γö£ Γùï /login
+Γö£ ╞Æ /patients
+Γö£ ╞Æ /patients/[id]
+Γö£ ╞Æ /patients/[id]/edit
+Γö£ ╞Æ /patients/new
+Γö£ ╞Æ /records
+Γö£ ╞Æ /records/[id]
+Γö£ ╞Æ /records/new
+Γö£ Γùï /register
+Γö£ ╞Æ /security
+Γöö ╞Æ /users
+
+
+╞Æ Proxy (Middleware)
+
+Γùï  (Static)   prerendered as static content
+╞Æ  (Dynamic)  server-rendered on demand
+
